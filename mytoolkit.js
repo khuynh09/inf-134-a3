@@ -7,21 +7,21 @@ SVG.on(document, "DOMContentLoaded", function () {
 
     btn.setText("My Button");
     btn.onclick(function (e) {
-        console.log("Execute: ", e);
+        console.log("Button: ", e);
     });
-    btn.move(100, 100);
+    btn.move(100, 50);
 
     var checkBox = new MyToolkit.Checkbox();
     checkBox.setText("Checkbox");
     checkBox.move(100, 50);
     checkBox.onclick(function (e) {
-        console.log(e);
+        console.log("Checkbox: ", e);
     });
 
     var radios = new MyToolkit.Radio(3, ["Option1", "Option2", "Option3"]);
     radios.move(100, 10);
     radios.onclick(function (e) {
-        console.log(e);
+        console.log("Radio: ", e);
     });
 
     var textBox = new MyToolkit.Textbox();
@@ -30,41 +30,58 @@ SVG.on(document, "DOMContentLoaded", function () {
 
     var scrollBar = new MyToolkit.Scrollbar();
     scrollBar.move(100, 10);
-    scrollBar.height(300);
+    scrollBar.height(200);
 
     var progressBar = new MyToolkit.ProgressBar();
     progressBar.move(100, 10);
     progressBar.width(300);
-    progressBar.value(50);
+    progressBar.value(70);
 
     var toggle = new MyToolkit.Toggle();
     toggle.move(100, 10);
 });
 
 var MyToolkit = (function () {
+    /**
+     * Represents a button with text.
+     * @constructor
+     */
     var Button = function () {
-        var draw = SVG().addTo("body").size("100%", "100%");
+        var draw = SVG().addTo("body").size("100%", "100px");
         var group = draw.group();
-        var rect = group.rect(100, 50).fill("#7892c2").radius(10);
-        var text = group.text("Button");
+        var rect = group
+            .rect(100, 50)
+            .fill("#7892c2")
+            .radius(10)
+            .addClass("button");
+        var text = group.text("Button").addClass("buttonText");
         text.font({ fill: "#ffffff", size: 16 });
         var len = text.length();
         text.attr({ x: (100 - len) / 2, y: (50 - 28) / 2 });
         var clickEvent = null;
-        var stateEvent = null;
         var defaultState = "idle";
 
-        rect.mouseover(function () {
+        group.mouseover(function (e) {
             rect.fill({ color: "#476e9e" });
-            if (defaultState !== "hovered") {
+            if (
+                e.path[0].className.baseVal == "button" &&
+                e.fromElement.tagName &&
+                e.fromElement.tagName != "tspan"
+            ) {
                 defaultState = "hovered";
                 console.log("State: ", defaultState);
             }
         });
-        group.mouseout(function () {
+        group.mouseout(function (e) {
             rect.fill({ color: "#7892c2" });
-            defaultState = "idle";
-            console.log("State: ", defaultState);
+            if (
+                e.path[0].className.baseVal == "button" &&
+                e.toElement.tagName &&
+                e.toElement.tagName != "tspan"
+            ) {
+                defaultState = "idle";
+                console.log("State: ", defaultState);
+            }
         });
 
         group.mouseup(function () {
@@ -85,6 +102,8 @@ var MyToolkit = (function () {
         return {
             /**
              * Position component given x and y positions
+             * @param {integer} x - x position
+             * @param {integer} y - y position
              */
             move: function (x, y) {
                 rect.move(x, y);
@@ -108,10 +127,13 @@ var MyToolkit = (function () {
             },
         };
     };
-
+    /**
+     * Represents a checkbox.
+     * @constructor
+     */
     var Checkbox = function () {
         let checked = false;
-        var draw = SVG().addTo("body").size("100%", "100%");
+        var draw = SVG().addTo("body").size("100%", "100px");
         var group = draw.group();
         var rect = group.rect(25, 25).attr({
             fill: "#fff",
@@ -119,7 +141,7 @@ var MyToolkit = (function () {
             strokeWidth: "1px",
         });
 
-        var text = group.text("Option");
+        var text = group.text("Checkbox");
         var image = group.image("./check.png").size(20, 20);
         image.hide();
         text.font({ fill: "#000", size: 16 });
@@ -177,7 +199,7 @@ var MyToolkit = (function () {
         } else {
             count = n;
         }
-        var draw = SVG().addTo("body").size("100%", "100%");
+        var draw = SVG().addTo("body").size("100%", "120px");
         var group = draw.group();
 
         var circleList = new SVG.List();
@@ -218,18 +240,31 @@ var MyToolkit = (function () {
             }
         }
 
+        var selected;
         circleList.each(function (item) {
             item.click(function (event) {
-                circleList.attr({
-                    stroke: "#000",
-                    fill: "#fff",
-                });
-                item.attr({
-                    stroke: "#fff",
-                    fill: "#7892c2",
-                });
                 var index = item.node.className.baseVal;
-                console.log(options[index], "selected");
+
+                if (selected != index) {
+                    circleList.attr({
+                        stroke: "#000",
+                        fill: "#fff",
+                    });
+                    item.attr({
+                        stroke: "#fff",
+                        fill: "#7892c2",
+                    });
+                    console.log(options[index], "selected");
+                } else {
+                    circleList.attr({
+                        stroke: "#000",
+                        fill: "#fff",
+                    });
+                    console.log(options[index], "unselected");
+                }
+
+                selected = index;
+
                 if (clickEvent != null) {
                     clickEvent(event);
                 }
@@ -238,15 +273,11 @@ var MyToolkit = (function () {
 
         var clickEvent = null;
 
-        group.click(function (event) {
-            if (clickEvent != null) {
-                clickEvent(event);
-            }
-        });
-
         return {
             /**
              * Position component given x and y positions
+             * @param {integer} x - x position
+             * @param {integer} y - y position
              */
             move: function (x, y) {
                 group.move(x, y);
@@ -267,11 +298,14 @@ var MyToolkit = (function () {
             },
         };
     };
-
+    /**
+     * Represents a checkbox.
+     * @constructor
+     */
     var Textbox = function () {
         var draw = SVG()
             .addTo("body")
-            .size("100%", "100%")
+            .size("100%", "100px")
             .addClass("textboxWrapper");
         var group = draw.group();
         var textbox = group
@@ -287,10 +321,10 @@ var MyToolkit = (function () {
             .stroke({ width: 1, color: "#7892c2" });
         caret.hide();
         var clicked = false;
-        group.click(function (e) {
+        group.mouseover(function (e) {
             clicked = true;
             caret.show();
-            console.log("Textbox Active");
+            console.log("Textbox Focused");
         });
         SVG.on(document, "keydown", function (e) {
             if (clicked) {
@@ -327,7 +361,7 @@ var MyToolkit = (function () {
             }
         });
 
-        SVG.on(document, "click", function (e) {
+        SVG.on(document, "mouseover", function (e) {
             if (
                 e.target.className.baseVal !== "textbox" &&
                 e.target.innerHTML != text.text()
@@ -335,10 +369,15 @@ var MyToolkit = (function () {
                 clicked = false;
                 caret.hide();
                 if (e.path[0].className.baseVal == "textboxWrapper")
-                    console.log("Textbox Inactive");
+                    console.log("Textbox Unfocused");
             }
         });
         return {
+            /**
+             * Position component given x and y positions
+             * @param {integer} x - x position
+             * @param {integer} y - y position
+             */
             move: function (x, y) {
                 group.move(x, y);
                 var len = text.length();
@@ -349,7 +388,15 @@ var MyToolkit = (function () {
                     25 + y
                 );
             },
+            /**
+             * If given param, this will set text of textbox. Otherwise, return the
+             * @param {string} t - The text to be set.
+             * @return {string} The text
+             */
             text: function (t) {
+                if (!t) {
+                    return text.text();
+                }
                 text.text(t);
                 var len = text.length();
                 caret.plot(
@@ -361,11 +408,14 @@ var MyToolkit = (function () {
             },
         };
     };
-
+    /**
+     * Represents a checkbox.
+     * @constructor
+     */
     var Scrollbar = function () {
         var draw = SVG()
             .addTo("body")
-            .size("100%", "500px")
+            .size("100%", "250px")
             .addClass("scrollbar");
         var group = draw.group();
         var scrollBar = group
@@ -379,12 +429,31 @@ var MyToolkit = (function () {
             .rect(8, scrollBar.height() / 4)
             .move(scrollBar.x() + 1, scrollBar.y() + 1)
             .radius(3)
-            .fill("#7892c2");
+            .fill("#7892c2")
+            .addClass("scrollthumb");
 
         var pressed = false;
 
+        group.mouseover(function (e) {
+            if (
+                !pressed &&
+                e.path[0].className.baseVal == "scrollbar" &&
+                e.fromElement.className.baseVal != "scrollthumb"
+            )
+                console.log("State: hovered");
+        });
+
+        group.mouseout(function (e) {
+            if (
+                !pressed &&
+                e.path[0].className.baseVal == "scrollbar" &&
+                e.toElement.className.baseVal != "scrollthumb"
+            )
+                console.log("State: idle");
+        });
         scrollThumb.mousedown(function (e) {
             pressed = true;
+            console.log("State: pressed");
         });
 
         SVG.on(document, "mousemove", function (e) {
@@ -392,17 +461,16 @@ var MyToolkit = (function () {
                 pressed == true &&
                 e.path[0].className.baseVal === "scrollbar"
             ) {
-                console.log("Offset: ", e.offsetY);
-                console.log(scrollBar.y() + 1);
-                console.log(e);
-
                 if (
                     e.offsetY <=
                         scrollBar.height() - scrollThumb.height() + 8 &&
                     e.offsetY > scrollBar.y() + 1
                 ) {
-                    console.log(e.offsetY);
                     scrollThumb.y(e.offsetY);
+                    console.log(
+                        "State: moved",
+                        e.movementY > 0 ? "down" : "up"
+                    );
                 }
             }
         });
@@ -414,37 +482,83 @@ var MyToolkit = (function () {
         });
 
         return {
+            /**
+             * Position component given x and y positions
+             * @param {integer} x - x position
+             * @param {integer} y - y position
+             */
             move: function (x, y) {
                 group.move(x, y);
             },
+            /**
+             * Set the height of the scroll bar
+             * @param {integer} y - The height of scroll bar
+             */
             height: function (y) {
                 scrollBar.height(y);
+                draw.height(y + 50);
+                scrollThumb.height(scrollBar.height() / 4);
             },
         };
     };
-
+    /**
+     * Represents a checkbox.
+     * @constructor
+     */
     var ProgressBar = function () {
-        var draw = SVG()
-            .addTo("body")
-            .size("100%", "100%")
-            .addClass("scrollbar");
+        var draw = SVG().addTo("body").size("100%", "80px");
         var group = draw.group();
         var progressBar = group
             .rect(200, 15)
             .fill("white")
             .stroke("black")
             .radius(3)
-            .addClass("scrollbar");
+            .addClass("progressbar");
 
-        var progress = group.rect(0, 15).fill("#7892c2").addClass("scrollbar");
+        var progress = group.rect(0, 15).fill("#7892c2").addClass("progress");
+
+        group.mouseover(function (e) {
+            if (
+                (e.path[0].className.baseVal == "progressbar" &&
+                    e.fromElement.className.baseVal != "progress") ||
+                (e.path[0].className.baseVal == "progress" &&
+                    e.fromElement.className.baseVal != "progressbar")
+            )
+                console.log("State: hovered");
+        });
+
+        group.mouseout(function (e) {
+            if (
+                (e.path[0].className.baseVal == "progressbar" &&
+                    e.toElement.className.baseVal != "progress") ||
+                (e.path[0].className.baseVal == "progress" &&
+                    e.toElement.className.baseVal != "progressbar")
+            )
+                console.log("State: idle");
+        });
 
         return {
+            /**
+             * Position component given x and y positions
+             * @param {integer} x - x position
+             * @param {integer} y - y position
+             */
             move: function (x, y) {
                 group.move(x, y);
             },
+
+            /**
+             * Set width of progress bar
+             * @param {integer} y - height of progress bar to set
+             */
             width: function (y) {
                 progressBar.width(y);
             },
+            /**
+             * If given param, this will set value of progress. Otherwise, return the value
+             * @param {string} t - The value to be set.
+             * @return {string} The value
+             */
             value: function (value) {
                 if (!value) {
                     return (progress.width() / progressBar.width()) * 100;
@@ -452,17 +566,29 @@ var MyToolkit = (function () {
                 var p = progressBar.width() * (value / 100);
                 progress.width(p);
             },
+            /**
+             * Increment progress bar's value
+             * @param {integer} value - value to increment between 0 - 100
+             */
             increment: function (value) {
                 var newValue;
                 if (value > 0 && value <= 100) {
                     newValue =
                         (progress.width() / progressBar.width()) * 100 + value;
-                    progress.width(progressBar.width() * (newValue / 100));
+
+                    if (
+                        progressBar.width() * (newValue / 100) <=
+                        progressBar.width()
+                    )
+                        progress.width(progressBar.width() * (newValue / 100));
                 }
             },
         };
     };
-
+    /**
+     * Represents a checkbox.
+     * @constructor
+     */
     var Toggle = function () {
         var draw = SVG().addTo("body").size("100%", "500px").addClass("toggle");
         var group = draw.group();
