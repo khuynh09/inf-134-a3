@@ -13,14 +13,32 @@ SVG.on(document, "DOMContentLoaded", function () {
     btn.move(100, 100);
 
     var checkBox = new MyToolkit.Checkbox();
-    checkBox.setText("2");
+    checkBox.setText("Checkbox");
     checkBox.move(100, 50);
     checkBox.onclick(function (e) {
         console.log(e);
     });
 
     var radios = new MyToolkit.Radio(3, ["Option1", "Option2", "Option3"]);
-    radios.move(100, 0);
+    radios.move(100, 10);
+    radios.onclick(function (e) {
+        console.log(e);
+    });
+
+    var textBox = new MyToolkit.Textbox();
+    textBox.move(100, 10);
+    textBox.text("jkohbjuhbuybuiyhb");
+
+    var scrollBar = new MyToolkit.Scrollbar();
+    scrollBar.move(100, 10);
+    scrollBar.height(300);
+
+    var progressBar = new MyToolkit.ProgressBar();
+    progressBar.move(100, 10);
+    progressBar.width(300);
+    progressBar.value(50);
+    progressBar.increment(40);
+    console.log(progressBar.value());
 });
 
 var MyToolkit = (function () {
@@ -29,7 +47,7 @@ var MyToolkit = (function () {
         var group = draw.group();
         var rect = group.rect(100, 50).fill("#7892c2").radius(10);
         var text = group.text("Button");
-        text.font({ fill: "#ffffff", size: 16, family: "Helvetica" });
+        text.font({ fill: "#ffffff", size: 16 });
         var len = text.length();
         text.attr({ x: (100 - len) / 2, y: (50 - 28) / 2 });
         var clickEvent = null;
@@ -49,13 +67,7 @@ var MyToolkit = (function () {
             console.log("State: Pressed");
         });
 
-        rect.click(function (event) {
-            this.fill({ color: "#7892c2" });
-
-            if (clickEvent != null) clickEvent(event);
-        });
-
-        text.click(function (event) {
+        group.click(function (event) {
             rect.fill({ color: "#7892c2" });
 
             if (clickEvent != null) clickEvent(event);
@@ -85,13 +97,13 @@ var MyToolkit = (function () {
         var rect = group.rect(25, 25).attr({
             fill: "#fff",
             stroke: "#000",
-            "stroke-width": "2px",
+            strokeWidth: "1px",
         });
 
         var text = group.text("Option");
         var image = group.image("./check.png").size(20, 20);
         image.hide();
-        text.font({ fill: "#000", size: 16, family: "Helvetica" });
+        text.font({ fill: "#000", size: 16 });
         text.attr({ x: 35, y: -2 });
 
         var clickEvent = null;
@@ -117,19 +129,6 @@ var MyToolkit = (function () {
             }
             checked = !checked;
         });
-
-        // image.click(function (event) {
-
-        //     if (checked){
-        //         image.hide()
-        //         rect.fill({ color: "#fff" });
-        //         rect.stroke("#000")
-
-        //     }
-        //     if (clickEvent != null && checked) {clickEvent(event); console.log("State: Unchecked")}
-        //     checked = !checked
-
-        // });
 
         return {
             move: function (x, y) {
@@ -172,7 +171,7 @@ var MyToolkit = (function () {
                 textList.push(
                     group
                         .text(options ? options[i] : "Option")
-                        .font({ fill: "#000", size: 16, family: "Helvetica" })
+                        .font({ fill: "#000", size: 16 })
                         .attr({ x: 35, y: -2 })
                 );
             } else {
@@ -189,13 +188,12 @@ var MyToolkit = (function () {
                 textList.push(
                     group
                         .text(options ? options[i] : "Option")
-                        .font({ fill: "#000", size: 16, family: "Helvetica" })
+                        .font({ fill: "#000", size: 16 })
                         .attr({ x: 35, y: textList[i - 1].y() + 28 })
                 );
             }
         }
 
-        var index = 0;
         circleList.each(function (item) {
             item.click(function (event) {
                 circleList.attr({
@@ -208,26 +206,11 @@ var MyToolkit = (function () {
                 });
                 var index = item.node.className.baseVal;
                 console.log(options[index], "selected");
+                if (clickEvent != null) {
+                    clickEvent(event);
+                }
             });
         });
-
-        // var circle2 = group.circle(25).move(100, 30).fill("#f09");
-
-        // create a set and add the elements
-
-        // list.push(circle2);
-        // var draw = SVG().addTo("body").size("100%", "100%");
-        // var group  = draw.group().addClass('radios')
-        // var circle = draw.circle(20).attr({
-        //     "fill": "#fff",
-        //     "stroke": "#000",
-        //     "stroke-width": "2px",
-        //     x: 100,
-        //     y: 10
-        // })
-
-        // text.font({fill:"#000", size: 16, family: 'Helvetica'});
-        // text.attr({x:35,y:-2})
 
         var clickEvent = null;
 
@@ -240,20 +223,209 @@ var MyToolkit = (function () {
         return {
             move: function (x, y) {
                 group.move(x, y);
-                // text.attr({x:x+35, y:y-2})
             },
-            // onclick: function (eventHandler) {
-            //     clickEvent = eventHandler;
-            // },
-            // setText: function(t){
-            //     text.text(t)
-            //     var len = text.length();
-            //     text.attr({x:(100-len)/2, y:(50-28)/2})
-
-            // }
+            onclick: function (eventHandler) {
+                clickEvent = eventHandler;
+            },
+            setText: function (n, text) {
+                textList[n].text(text);
+            },
         };
     };
-    return { Button, Checkbox, Radio };
+
+    var Textbox = function () {
+        var draw = SVG().addTo("body").size("100%", "100%");
+        var group = draw.group();
+        var textbox = group
+            .rect(200, 30)
+            .fill("white")
+            .stroke("black")
+            .radius(5)
+            .addClass("textbox");
+
+        var text = group.text("yes").move(4, 5).addClass("textbox");
+        var caret = group
+            .line(30, 4, 30, 25)
+            .stroke({ width: 1, color: "#7892c2" });
+        caret.hide();
+        var clicked = false;
+        group.click(function (e) {
+            clicked = true;
+            caret.show();
+            console.log("Textbox Active");
+        });
+        SVG.on(document, "keydown", function (e) {
+            if (clicked) {
+                var newText;
+                if (e.key == "Backspace") {
+                    newText = text.text().substring(0, text.text().length - 1);
+                    text.text(newText);
+                    var len = text.length();
+                    caret.plot(
+                        group.x() + len + 8,
+                        4 + group.y(),
+                        group.x() + len + 8,
+                        25 + group.y()
+                    );
+                } else {
+                    newText = text.text() + e.key;
+                    text.text(newText);
+                    var len = text.length();
+                    caret.plot(
+                        group.x() + len + 8,
+                        4 + group.y(),
+                        group.x() + len + 8,
+                        25 + group.y()
+                    );
+                }
+                console.log("Text Changed");
+            }
+        });
+
+        SVG.on(document, "mousewheel", function (e) {
+            console.log(e);
+        });
+
+        SVG.on(document, "click", function (e) {
+            if (
+                e.target.className.baseVal !== "textbox" &&
+                e.target.innerHTML != text.text()
+            ) {
+                clicked = false;
+                caret.hide();
+                console.log("Textbox Inactive");
+            }
+        });
+        return {
+            move: function (x, y) {
+                group.move(x, y);
+                var len = text.length();
+                caret.plot(
+                    group.x() + len + 8,
+                    4 + y,
+                    group.x() + len + 8,
+                    25 + y
+                );
+            },
+            text: function (t) {
+                text.text(t);
+                var len = text.length();
+                caret.plot(
+                    group.x() + len + 8,
+                    4 + group.y(),
+                    group.x() + len + 8,
+                    25 + group.y()
+                );
+            },
+        };
+    };
+
+    var Scrollbar = function () {
+        var draw = SVG()
+            .addTo("body")
+            .size("100%", "500px")
+            .addClass("scrollbar");
+        var group = draw.group();
+        var scrollBar = group
+            .rect(10, 200)
+            .fill("white")
+            .stroke("black")
+            .radius(3)
+            .addClass("scrollbar");
+
+        var scrollThumb = group
+            .rect(8, scrollBar.height() / 4)
+            .move(scrollBar.x() + 1, scrollBar.y() + 1)
+            .radius(3)
+            .fill("#7892c2");
+
+        var pressed = false;
+
+        scrollThumb.mousedown(function (e) {
+            pressed = true;
+        });
+
+        // scrollThumb.mousemove(function (e) {
+        //     console.log(e);
+        // });
+
+        SVG.on(document, "mousemove", function (e) {
+            if (
+                pressed == true &&
+                e.path[0].className.baseVal === "scrollbar"
+            ) {
+                console.log("Offset: ", e.offsetY);
+                console.log(scrollBar.y() + 1);
+                console.log(e);
+
+                if (
+                    e.offsetY <=
+                        scrollBar.height() - scrollThumb.height() + 8 &&
+                    e.offsetY > scrollBar.y() + 1
+                ) {
+                    console.log(e.offsetY);
+                    scrollThumb.y(e.offsetY);
+                }
+            }
+        });
+
+        SVG.on(document, "mouseup", function (e) {
+            if (pressed) {
+                pressed = false;
+            }
+        });
+
+        return {
+            move: function (x, y) {
+                group.move(x, y);
+            },
+            height: function (y) {
+                scrollBar.height(y);
+            },
+        };
+    };
+
+    var ProgressBar = function () {
+        var draw = SVG()
+            .addTo("body")
+            .size("100%", "500px")
+            .addClass("scrollbar");
+        var group = draw.group();
+        var progressBar = group
+            .rect(200, 15)
+            .fill("white")
+            .stroke("black")
+            .radius(3)
+            .addClass("scrollbar");
+
+        var progress = group.rect(0, 15).fill("#7892c2").addClass("scrollbar");
+
+        return {
+            move: function (x, y) {
+                group.move(x, y);
+            },
+            width: function (y) {
+                progressBar.width(y);
+            },
+            value: function (value) {
+                if (!value) {
+                    return (progress.width() / progressBar.width()) * 100;
+                }
+                var p = progressBar.width() * (value / 100);
+                progress.width(p);
+            },
+            increment: function (value) {
+                var newValue;
+                if (value > 0 && value <= 100) {
+                    newValue =
+                        (progress.width() / progressBar.width()) * 100 + value;
+                    progress.width(progressBar.width() * (newValue / 100));
+                }
+            },
+        };
+    };
+
+    return { Button, Checkbox, Radio, Textbox, Scrollbar, ProgressBar };
 })();
 
-// export { MyToolkit };
+export { MyToolkit };
