@@ -7,8 +7,7 @@ SVG.on(document, "DOMContentLoaded", function () {
 
     btn.setText("My Button");
     btn.onclick(function (e) {
-        console.log(e);
-        console.log("Execute");
+        console.log("Execute: ", e);
     });
     btn.move(100, 100);
 
@@ -27,7 +26,7 @@ SVG.on(document, "DOMContentLoaded", function () {
 
     var textBox = new MyToolkit.Textbox();
     textBox.move(100, 10);
-    textBox.text("jkohbjuhbuybuiyhb");
+    textBox.text("Test");
 
     var scrollBar = new MyToolkit.Scrollbar();
     scrollBar.move(100, 10);
@@ -37,8 +36,9 @@ SVG.on(document, "DOMContentLoaded", function () {
     progressBar.move(100, 10);
     progressBar.width(300);
     progressBar.value(50);
-    progressBar.increment(40);
-    console.log(progressBar.value());
+
+    var toggle = new MyToolkit.Toggle();
+    toggle.move(100, 10);
 });
 
 var MyToolkit = (function () {
@@ -51,20 +51,29 @@ var MyToolkit = (function () {
         var len = text.length();
         text.attr({ x: (100 - len) / 2, y: (50 - 28) / 2 });
         var clickEvent = null;
-        text.mouseover(null);
+        var stateEvent = null;
+        var defaultState = "idle";
 
-        group.mouseover(function () {
+        rect.mouseover(function () {
             rect.fill({ color: "#476e9e" });
+            if (defaultState !== "hovered") {
+                defaultState = "hovered";
+                console.log("State: ", defaultState);
+            }
         });
         group.mouseout(function () {
             rect.fill({ color: "#7892c2" });
+            defaultState = "idle";
+            console.log("State: ", defaultState);
         });
 
         group.mouseup(function () {
-            console.log("State: Idle");
+            defaultState = "idle";
+            console.log("State: ", defaultState);
         });
         group.mousedown(function () {
-            console.log("State: Pressed");
+            defaultState = "pressed";
+            console.log("State: ", defaultState);
         });
 
         group.click(function (event) {
@@ -74,14 +83,24 @@ var MyToolkit = (function () {
         });
 
         return {
+            /**
+             * Position component given x and y positions
+             */
             move: function (x, y) {
                 rect.move(x, y);
                 var len = text.length();
                 text.attr({ x: x + (100 - len) / 2, y: y + (50 - 28) / 2 });
             },
+            /**
+             * Run passed in eventHandlder
+             */
             onclick: function (eventHandler) {
                 clickEvent = eventHandler;
             },
+
+            /**
+             * Sets text of button
+             */
             setText: function (t) {
                 text.text(t);
                 var len = text.length();
@@ -145,7 +164,12 @@ var MyToolkit = (function () {
             },
         };
     };
-
+    /**
+     * Represents radio buttons.
+     * @constructor
+     * @param {string} n - Number of radios from 2-n
+     * @param {string} options - The option/text of each n radio
+     */
     var Radio = function (n, options) {
         var count;
         if (!n) {
@@ -221,12 +245,23 @@ var MyToolkit = (function () {
         });
 
         return {
+            /**
+             * Position component given x and y positions
+             */
             move: function (x, y) {
                 group.move(x, y);
             },
+
+            /**
+             * Run passed in eventHandlder
+             */
             onclick: function (eventHandler) {
                 clickEvent = eventHandler;
             },
+
+            /**
+             * Sets text of radio given the position starting from 0
+             */
             setText: function (n, text) {
                 textList[n].text(text);
             },
@@ -234,7 +269,10 @@ var MyToolkit = (function () {
     };
 
     var Textbox = function () {
-        var draw = SVG().addTo("body").size("100%", "100%");
+        var draw = SVG()
+            .addTo("body")
+            .size("100%", "100%")
+            .addClass("textboxWrapper");
         var group = draw.group();
         var textbox = group
             .rect(200, 30)
@@ -267,8 +305,15 @@ var MyToolkit = (function () {
                         group.x() + len + 8,
                         25 + group.y()
                     );
-                } else {
+                } else if (
+                    e.which != 9 &&
+                    e.which != 20 &&
+                    e.which != 16 &&
+                    e.which != 17
+                ) {
+                    e.preventDefault();
                     newText = text.text() + e.key;
+
                     text.text(newText);
                     var len = text.length();
                     caret.plot(
@@ -282,10 +327,6 @@ var MyToolkit = (function () {
             }
         });
 
-        SVG.on(document, "mousewheel", function (e) {
-            console.log(e);
-        });
-
         SVG.on(document, "click", function (e) {
             if (
                 e.target.className.baseVal !== "textbox" &&
@@ -293,7 +334,8 @@ var MyToolkit = (function () {
             ) {
                 clicked = false;
                 caret.hide();
-                console.log("Textbox Inactive");
+                if (e.path[0].className.baseVal == "textboxWrapper")
+                    console.log("Textbox Inactive");
             }
         });
         return {
@@ -345,10 +387,6 @@ var MyToolkit = (function () {
             pressed = true;
         });
 
-        // scrollThumb.mousemove(function (e) {
-        //     console.log(e);
-        // });
-
         SVG.on(document, "mousemove", function (e) {
             if (
                 pressed == true &&
@@ -388,7 +426,7 @@ var MyToolkit = (function () {
     var ProgressBar = function () {
         var draw = SVG()
             .addTo("body")
-            .size("100%", "500px")
+            .size("100%", "100%")
             .addClass("scrollbar");
         var group = draw.group();
         var progressBar = group
@@ -425,7 +463,43 @@ var MyToolkit = (function () {
         };
     };
 
-    return { Button, Checkbox, Radio, Textbox, Scrollbar, ProgressBar };
+    var Toggle = function () {
+        var draw = SVG().addTo("body").size("100%", "500px").addClass("toggle");
+        var group = draw.group();
+        var toggle = group
+            .rect(40, 20)
+            .fill("lightgrey")
+            .stroke("black")
+            .radius(10)
+            .addClass("scrollbar");
+
+        var circle = group.circle(16).move(2, 2).fill("white");
+
+        var toggled = false;
+
+        group.click(function (e) {
+            if (toggled) {
+                toggle.fill("lightgray");
+                toggled = false;
+                circle.move(circle.x() - 20);
+            } else {
+                toggle.fill("#7892c2");
+                circle.move(circle.x() + 20);
+                toggled = true;
+            }
+        });
+
+        return {
+            move: function (x, y) {
+                group.move(x, y);
+            },
+            toggle: function () {
+                toggled = !toggled;
+            },
+        };
+    };
+
+    return { Button, Checkbox, Radio, Textbox, Scrollbar, ProgressBar, Toggle };
 })();
 
 export { MyToolkit };
