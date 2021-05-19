@@ -323,7 +323,7 @@ var MyToolkit = (function () {
             .radius(5)
             .addClass("textbox");
 
-        var text = group.text("yes").move(4, 5).addClass("textbox");
+        var text = group.text("").move(4, 5).addClass("textbox");
         var caret = group
             .line(30, 4, 30, 25)
             .stroke({ width: 1, color: "#7892c2" });
