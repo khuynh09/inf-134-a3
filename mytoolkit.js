@@ -370,15 +370,11 @@ var MyToolkit = (function () {
             }
         });
 
-        SVG.on(document, "mouseover", function (e) {
-            if (
-                e.target.className.baseVal !== "textbox" &&
-                e.target.innerHTML != text.text()
-            ) {
+        group.mouseout(function (e) {
+            if (e.fromElement.className.baseVal === "textbox") {
                 clicked = false;
                 caret.hide();
-                if (e.path[0].className.baseVal == "textboxWrapper")
-                    console.log("State: Textbox Unfocused");
+                console.log("State: Textbox Unfocused");
             }
         });
         return {
