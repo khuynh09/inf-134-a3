@@ -1,4 +1,32 @@
-// File name: mytoolkit.js
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: mytoolkit.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: mytoolkit.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>// File name: mytoolkit.js
 
 import { SVG } from "./svg.min.js";
 
@@ -67,8 +95,8 @@ var MyToolkit = (function () {
         group.mouseover(function (e) {
             rect.fill({ color: "#476e9e" });
             if (
-                e.path[0].className.baseVal == "button" &&
-                e.fromElement.tagName &&
+                e.path[0].className.baseVal == "button" &amp;&amp;
+                e.fromElement.tagName &amp;&amp;
                 e.fromElement.tagName != "tspan"
             ) {
                 defaultState = "hovered";
@@ -78,8 +106,8 @@ var MyToolkit = (function () {
         group.mouseout(function (e) {
             rect.fill({ color: "#7892c2" });
             if (
-                e.path[0].className.baseVal == "button" &&
-                e.toElement.tagName &&
+                e.path[0].className.baseVal == "button" &amp;&amp;
+                e.toElement.tagName &amp;&amp;
                 e.toElement.tagName != "tspan"
             ) {
                 defaultState = "idle";
@@ -218,7 +246,7 @@ var MyToolkit = (function () {
         var circleList = new SVG.List();
         var textList = new SVG.List();
 
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i &lt; count; i++) {
             if (i == 0) {
                 circleList.push(
                     group
@@ -356,9 +384,9 @@ var MyToolkit = (function () {
                         25 + group.y()
                     );
                 } else if (
-                    e.which != 9 &&
-                    e.which != 20 &&
-                    e.which != 16 &&
+                    e.which != 9 &amp;&amp;
+                    e.which != 20 &amp;&amp;
+                    e.which != 16 &amp;&amp;
                     e.which != 17
                 ) {
                     e.preventDefault();
@@ -448,8 +476,8 @@ var MyToolkit = (function () {
 
         group.mouseover(function (e) {
             if (
-                !pressed &&
-                e.path[0].className.baseVal == "scrollbar" &&
+                !pressed &amp;&amp;
+                e.path[0].className.baseVal == "scrollbar" &amp;&amp;
                 e.fromElement.className.baseVal != "scrollthumb"
             )
                 console.log("State: hovered");
@@ -457,8 +485,8 @@ var MyToolkit = (function () {
 
         group.mouseout(function (e) {
             if (
-                !pressed &&
-                e.path[0].className.baseVal == "scrollbar" &&
+                !pressed &amp;&amp;
+                e.path[0].className.baseVal == "scrollbar" &amp;&amp;
                 e.toElement.className.baseVal != "scrollthumb"
             )
                 console.log("State: idle");
@@ -470,12 +498,12 @@ var MyToolkit = (function () {
 
         SVG.on(document, "mousemove", function (e) {
             if (
-                pressed == true &&
+                pressed == true &amp;&amp;
                 e.path[0].className.baseVal === "scrollbar"
             ) {
                 if (
-                    e.offsetY <=
-                        scrollBar.height() - scrollThumb.height() + 8 &&
+                    e.offsetY &lt;=
+                        scrollBar.height() - scrollThumb.height() + 8 &amp;&amp;
                     e.offsetY > scrollBar.y() + 1
                 ) {
                     scrollThumb.y(e.offsetY);
@@ -531,9 +559,9 @@ var MyToolkit = (function () {
 
         group.mouseover(function (e) {
             if (
-                (e.path[0].className.baseVal == "progressbar" &&
+                (e.path[0].className.baseVal == "progressbar" &amp;&amp;
                     e.fromElement.className.baseVal != "progress") ||
-                (e.path[0].className.baseVal == "progress" &&
+                (e.path[0].className.baseVal == "progress" &amp;&amp;
                     e.fromElement.className.baseVal != "progressbar")
             )
                 console.log("State: hovered");
@@ -541,9 +569,9 @@ var MyToolkit = (function () {
 
         group.mouseout(function (e) {
             if (
-                (e.path[0].className.baseVal == "progressbar" &&
+                (e.path[0].className.baseVal == "progressbar" &amp;&amp;
                     e.toElement.className.baseVal != "progress") ||
-                (e.path[0].className.baseVal == "progress" &&
+                (e.path[0].className.baseVal == "progress" &amp;&amp;
                     e.toElement.className.baseVal != "progressbar")
             )
                 console.log("State: idle");
@@ -584,12 +612,12 @@ var MyToolkit = (function () {
              */
             increment: function (value) {
                 var newValue;
-                if (value > 0 && value <= 100) {
+                if (value > 0 &amp;&amp; value &lt;= 100) {
                     newValue =
                         (progress.width() / progressBar.width()) * 100 + value;
 
                     if (
-                        progressBar.width() * (newValue / 100) <=
+                        progressBar.width() * (newValue / 100) &lt;=
                         progressBar.width()
                     )
                         progress.width(progressBar.width() * (newValue / 100));
@@ -658,3 +686,26 @@ var MyToolkit = (function () {
 })();
 
 export { MyToolkit };
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#height">height</a></li><li><a href="global.html#increment">increment</a></li><li><a href="global.html#move">move</a></li><li><a href="global.html#onclick">onclick</a></li><li><a href="global.html#setText">setText</a></li><li><a href="global.html#text">text</a></li><li><a href="global.html#toggle">toggle</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#width">width</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.7</a> on Tue May 18 2021 18:50:47 GMT-0700 (Pacific Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
