@@ -36,6 +36,10 @@ SVG.on(document, "DOMContentLoaded", function () {
     progressBar.move(100, 10);
     progressBar.width(300);
     progressBar.value(70);
+    progressBar.value(70);
+    progressBar.value(70);
+    progressBar.value(70);
+    progressBar.increment(5);
 
     var toggle = new MyToolkit.Toggle();
     toggle.move(100, 10);
@@ -148,8 +152,10 @@ var MyToolkit = (function () {
         text.attr({ x: 35, y: -2 });
 
         var clickEvent = null;
-
-        group.click(function (event) {
+        group.mousedown(function (event) {
+            console.log("State: pressed");
+        });
+        group.mouseup(function (event) {
             if (!checked) {
                 rect.fill({ color: "#7892c2" });
                 image.attr({ x: rect.x() + 3, y: rect.y() + 2 });
@@ -242,7 +248,10 @@ var MyToolkit = (function () {
 
         var selected;
         circleList.each(function (item) {
-            item.click(function (event) {
+            item.mousedown(function (event) {
+                console.log("State: pressed");
+            });
+            item.mouseup(function (event) {
                 var index = item.node.className.baseVal;
 
                 if (selected != index) {
@@ -254,13 +263,13 @@ var MyToolkit = (function () {
                         stroke: "#fff",
                         fill: "#7892c2",
                     });
-                    console.log(options[index], "selected");
+                    console.log("State:", options[index], "selected");
                 } else {
                     circleList.attr({
                         stroke: "#000",
                         fill: "#fff",
                     });
-                    console.log(options[index], "unselected");
+                    console.log("State:", options[index], "unselected");
                 }
 
                 selected = index;
@@ -324,7 +333,7 @@ var MyToolkit = (function () {
         group.mouseover(function (e) {
             clicked = true;
             caret.show();
-            console.log("Textbox Focused");
+            console.log("State: Textbox Focused");
         });
         SVG.on(document, "keydown", function (e) {
             if (clicked) {
@@ -369,7 +378,7 @@ var MyToolkit = (function () {
                 clicked = false;
                 caret.hide();
                 if (e.path[0].className.baseVal == "textboxWrapper")
-                    console.log("Textbox Unfocused");
+                    console.log("State: Textbox Unfocused");
             }
         });
         return {
@@ -581,6 +590,9 @@ var MyToolkit = (function () {
                         progressBar.width()
                     )
                         progress.width(progressBar.width() * (newValue / 100));
+                    else {
+                        progress.width(progressBar.width());
+                    }
                 }
             },
         };
@@ -603,15 +615,20 @@ var MyToolkit = (function () {
 
         var toggled = false;
 
-        group.click(function (e) {
+        group.mousedown(function (e) {
+            console.log("State: pressed");
+        });
+        group.mouseup(function (e) {
             if (toggled) {
                 toggle.fill("lightgray");
                 toggled = false;
                 circle.move(circle.x() - 20);
+                console.log("State: untoggled");
             } else {
                 toggle.fill("#7892c2");
                 circle.move(circle.x() + 20);
                 toggled = true;
+                console.log("State: toggled");
             }
         });
 
