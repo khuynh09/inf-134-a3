@@ -26,7 +26,6 @@ SVG.on(document, "DOMContentLoaded", function () {
 
     var textBox = new MyToolkit.Textbox();
     textBox.move(100, 10);
-    textBox.text("Test");
 
     var scrollBar = new MyToolkit.Scrollbar();
     scrollBar.move(100, 10);
